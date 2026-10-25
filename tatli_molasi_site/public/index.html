@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tatlı Molası | Yakınındaki pastaneler</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top"><a class="brand" href="/">Tatlı <span>Molası</span></a><a class="admin-link" href="/admin.html">Yönetici girişi</a></header>
+<main class="wrap">
+<section class="hero">
+  <p class="eyebrow">BUGÜN KENDİNİ ŞIMART</p>
+  <h1>Mutluluğa <em>yakınsın.</em></h1>
+  <p class="intro">Çevrendeki pastaneleri keşfet, tatlılara göz at ve siparişini planla.</p>
+  <div class="notice"><strong>Konum gizliliğin önemli.</strong> Konumun yalnızca aşağıdaki düğmeye basıp telefonunun konum iznini kabul ettiğinde paylaşılır. Paylaşılan konum, site sahibinin özel yönetici panelinde görünür ve 24 saat içinde otomatik silinir.</div>
+  <button id="shareBtn" class="primary">Konumumu paylaş ve pastaneleri bul</button>
+  <p id="status" class="status" role="status">Konum paylaşmak istemiyorsan haritayı elle de inceleyebilirsin.</p>
+</section>
+<section class="section">
+  <div class="section-head"><div><p class="eyebrow">KEŞFET</p><h2>Yakınındaki pastaneler</h2></div><span class="pill">Harita</span></div>
+  <div id="map" aria-label="Pastaneler haritası"></div>
+  <p class="hint">Pastane verileri OpenStreetMap topluluk verilerinden alınır; her işletme listelenmeyebilir. Harita için internet bağlantısı gerekir.</p>
+  <div id="bakeryList" class="bakery-list"><div class="empty">Pastaneleri görmek için konumunu paylaş.</div></div>
+</section>
+<section class="section menu">
+  <p class="eyebrow">TATLI SEÇENEKLERİ</p><h2>Bugün ne canın çekiyor?</h2>
+  <div class="cards">
+    <article class="food"><div class="food-emoji">🍰</div><h3>Yaş pasta</h3><p>Doğum günü ve özel günler için.</p></article>
+    <article class="food"><div class="food-emoji">🧁</div><h3>Mini tatlılar</h3><p>Paylaşmalık küçük mutluluklar.</p></article>
+    <article class="food"><div class="food-emoji">🥐</div><h3>Hamur işleri</h3><p>Taze ve lezzetli seçenekler.</p></article>
+  </div>
+  <p class="hint">Bu başlangıç sürümünde gerçek ödeme veya sipariş gönderimi yoktur; ürün ve sipariş sistemi sonraki aşamada eklenebilir.</p>
+</section>
+</main>
+<footer>© Tatlı Molası · Konum yalnızca açık izinle paylaşılır.</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="/app.js"></script>
+</body></html>
