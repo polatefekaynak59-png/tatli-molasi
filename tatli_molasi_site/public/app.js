@@ -1,86 +1,103 @@
 
-(() => {
-  function baslat() {
-    const buton = document.getElementById("location-button");
-    const mesaj = document.getElementById("location-status");
+document.addEventListener("DOMContentLoaded", () => {
+  const button = document.getElementById("location-button");
+  const status = document.getElementById("location-status");
+  const mapElement = document.getElementById("map");
 
-    if (!buton || !mesaj) {
-      console.error("Konum butonu veya mesaj alanı bulunamadı.");
+  if (!button || !status) {
+    console.error("Konum butonu HTML içinde bulunamadı.");
+    return;
+  }
+
+  let map;
+  let marker;
+
+  button.addEventListener("click", () => {
+    status.textContent = "Buton çalışıyor. Konum izni bekleniyor...";
+
+    if (!navigator.geolocation || !window.isSecureContext) {
+      status.textContent =
+        "Konum için HTTPS bağlantısı ve tarayıcı konum desteği gerekiyor.";
       return;
     }
 
-    buton.addEventListener("click", () => {
-      mesaj.textContent = "Konum özelliği başlatılıyor...";
+    button.disabled = true;
 
-      if (!window.isSecureContext || !navigator.geolocation) {
-        mesaj.textContent =
-          "Konum kullanılamıyor. Siteyi HTTPS üzerinden açıp tekrar dene.";
-        return;
-      }
+    navigator.geolocation.getCurrentPosition(
+      async position => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
 
-      buton.disabled = true;
-      mesaj.textContent = "Konum izni bekleniyor...";
+        try {
+          if (mapElement && window.L) {
+            if (!map) {
+              map = L.map(mapElement).setView(
+                [latitude, longitude], 15
+              );
 
-      navigator.geolocation.getCurrentPosition(
-        async (konum) => {
-          const lat = konum.coords.latitude;
-          const lng = konum.coords.longitude;
-
-          mesaj.textContent = "Konum alındı, kaydediliyor...";
-
-          try {
-            const yanit = await fetch("/api/share-location", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                lat,
-                lng,
-                latitude: lat,
-                longitude: lng,
-                consent: true,
-                label: "Müşteri konumu"
-              })
-            });
-
-            const veri = await yanit.json().catch(() => ({}));
-
-            if (!yanit.ok) {
-              throw new Error(veri.error || "Sunucu konumu kaydedemedi.");
+              L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+                  attribution: "&copy; OpenStreetMap contributors"
+                }
+              ).addTo(map);
+            } else {
+              map.setView([latitude, longitude], 15);
             }
 
-            mesaj.textContent = "Konum başarıyla kaydedildi.";
-          } catch (hata) {
-            console.error(hata);
-            mesaj.textContent =
-              "Konum alındı ama kaydedilemedi. Sunucu ayarları kontrol edilmeli.";
-          } finally {
-            buton.disabled = false;
+            if (marker) {
+              marker.setLatLng([latitude, longitude]);
+            } else {
+              marker = L.marker([latitude, longitude]).addTo(map);
+            }
+
+            marker.bindPopup("Paylaştığın konum").openPopup();
           }
-        },
-        (hata) => {
-          const mesajlar = {
-            1: "Konum izni reddedildi. Tarayıcı ayarlarından konum izni ver.",
-            2: "Konum bulunamadı. Cihazının konum ayarlarını kontrol et.",
-            3: "İstek zaman aşımına uğradı. Tekrar dene."
-          };
 
-          mesaj.textContent =
-            mesajlar[hata.code] || "Konum alınamadı. Tekrar dene.";
+          status.textContent = "Konum alındı, kaydediliyor...";
 
-          buton.disabled = false;
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 20000,
-          maximumAge: 0
+          const response = await fetch("/api/share-location", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              latitude,
+              longitude,
+              consent: true
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok) {
+            throw new Error(result.error || "Konum kaydedilemedi.");
+          }
+
+          status.textContent = "Konum başarıyla kaydedildi.";
+        } catch (error) {
+          console.error(error);
+          status.textContent =
+            "Konum alındı ancak kaydedilemedi: " + error.message;
+        } finally {
+          button.disabled = false;
         }
-      );
-    });
-  }
+      },
+      error => {
+        const messages = {
+          1: "Konum izni reddedildi. Tarayıcı ayarlarından izin ver.",
+          2: "Konum bulunamadı. Cihazının konum ayarlarını kontrol et.",
+          3: "Konum isteği zaman aşımına uğradı. Tekrar dene."
+        };
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", baslat);
-  } else {
-    baslat();
-  }
-})();
+        status.textContent =
+          messages[error.code] || "Konum alınamadı.";
+
+        button.disabled = false;
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 0
+      }
+    );
+  });
+});
