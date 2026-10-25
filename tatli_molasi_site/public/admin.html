@@ -1,7 +1,484 @@
-<!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yönetici paneli | Tatlı Molası</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><link rel="stylesheet" href="/style.css"></head>
-<body><header class="top"><a class="brand" href="/">Tatlı <span>Molası</span></a><a class="admin-link" href="/">Müşteri sayfası</a></header>
-<main class="admin-wrap"><p class="eyebrow">ÖZEL ALAN</p><h1 style="font-size:clamp(34px,6vw,52px)">Yönetici <em>paneli</em></h1>
-<div class="panel"><h2>Güvenli giriş</h2><p class="hint">Sunucuyu kurarken belirlediğin yönetici anahtarını gir. Anahtarı müşterilerle paylaşma.</p><label class="field" for="token">Yönetici anahtarı</label><input id="token" type="password" autocomplete="current-password" placeholder="Yönetici anahtarını gir"><div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button id="load" class="primary">Paylaşılan konumları getir</button><button id="clearToken" class="secondary">Anahtarı temizle</button></div><p id="adminStatus" class="status" role="status"></p></div>
-<div class="panel"><div class="section-head"><h2>Konum haritası</h2><button id="refresh" class="secondary">Yenile</button></div><div id="adminMap" style="height:350px;border-radius:14px"></div><p class="hint">Yalnızca açıkça paylaşılan konumlar gösterilir. Kayıtlar 24 saat sonra otomatik silinir; istersen tek tek daha erken silebilirsin.</p><div id="locations"><div class="empty">Güvenli giriş yaptıktan sonra konumlar burada görünür.</div></div></div></main>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="/admin.js"></script></body></html>
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff8f1">
+  <title>Yönetici Paneli | Tatlı Molası</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    :root {
+      --admin-bg: #fff9f3;
+      --admin-card: #ffffff;
+      --admin-pink: #b96768;
+      --admin-pink-light: #f8e5e1;
+      --admin-brown: #49342e;
+      --admin-muted: #88746c;
+      --admin-border: #efe3d9;
+    }
+
+    body {
+      background: var(--admin-bg);
+      color: var(--admin-brown);
+      font-family: "DM Sans", Arial, sans-serif;
+    }
+
+    .admin-top {
+      background: rgba(255,255,255,.92);
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .admin-top-inner {
+      max-width: 1160px;
+      margin: auto;
+      padding: 18px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 21px;
+      text-decoration: none;
+      color: var(--admin-brown);
+      font-weight: 600;
+    }
+
+    .admin-logo {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: var(--admin-pink-light);
+      font-size: 24px;
+    }
+
+    .admin-brand span:last-child b {
+      color: var(--admin-pink);
+    }
+
+    .admin-brand small {
+      display: block;
+      margin-top: 3px;
+      font-size: 9px;
+      letter-spacing: 1.8px;
+      color: var(--admin-muted);
+    }
+
+    .admin-link {
+      padding: 12px 16px;
+      border: 1px solid var(--admin-border);
+      border-radius: 30px;
+      color: var(--admin-brown);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .admin-link:hover {
+      background: var(--admin-pink-light);
+    }
+
+    .admin-wrap {
+      width: min(1080px, calc(100% - 36px));
+      margin: 42px auto 75px;
+    }
+
+    .admin-intro {
+      margin-bottom: 28px;
+    }
+
+    .admin-eyebrow {
+      color: var(--admin-pink);
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .admin-intro h1 {
+      margin: 12px 0;
+      font-family: "Playfair Display", Georgia, serif;
+      font-size: clamp(35px, 5vw, 51px);
+      font-weight: 600;
+      letter-spacing: -1px;
+    }
+
+    .admin-intro h1 em {
+      color: var(--admin-pink);
+      font-weight: 500;
+    }
+
+    .admin-intro p {
+      max-width: 580px;
+      color: var(--admin-muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 12px;
+      border-radius: 30px;
+      background: #f4e9dc;
+      color: #755b3e;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .panel {
+      margin: 20px 0;
+      padding: 25px;
+      border: 1px solid var(--admin-border);
+      border-radius: 18px;
+      background: var(--admin-card);
+      box-shadow: 0 10px 35px rgba(91,55,43,.045);
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .panel-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-icon {
+      width: 43px;
+      height: 43px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      border-radius: 13px;
+      background: var(--admin-pink-light);
+      font-size: 22px;
+    }
+
+    .hint {
+      color: var(--admin-muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .field {
+      display: block;
+      margin: 19px 0 8px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    #token {
+      width: 100%;
+      min-height: 47px;
+      padding: 13px 14px;
+      border: 1px solid #e8d8ce;
+      border-radius: 10px;
+      outline: none;
+      background: #fffdfa;
+      color: var(--admin-brown);
+      font-size: 14px;
+    }
+
+    #token:focus {
+      border-color: var(--admin-pink);
+      box-shadow: 0 0 0 3px rgba(185,103,104,.12);
+    }
+
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .admin-wrap button {
+      min-height: 42px;
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      transition: .2s;
+    }
+
+    .admin-wrap button.primary {
+      background: var(--admin-pink);
+      color: white;
+    }
+
+    .admin-wrap button.primary:hover {
+      background: #a95658;
+      transform: translateY(-1px);
+    }
+
+    .admin-wrap button.secondary {
+      border: 1px solid var(--admin-border);
+      background: #fffaf6;
+      color: var(--admin-brown);
+    }
+
+    .admin-wrap button.secondary:hover {
+      background: var(--admin-pink-light);
+    }
+
+    .admin-wrap button.danger {
+      border-color: #f0ceca;
+      background: #fff0ee;
+      color: #a53f3a;
+    }
+
+    .status {
+      min-height: 17px;
+      margin: 13px 0 0;
+      color: #527b5b;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 17px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+    }
+
+    #adminMap {
+      height: 380px;
+      border: 1px solid var(--admin-border);
+      border-radius: 13px;
+      z-index: 1;
+    }
+
+    .map-note {
+      margin: 13px 0 20px;
+    }
+
+    #locations {
+      display: grid;
+      gap: 12px;
+    }
+
+    .empty {
+      padding: 26px 18px;
+      border: 1px dashed #e7d5cb;
+      border-radius: 12px;
+      background: #fffcf8;
+      color: var(--admin-muted);
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .location-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 17px;
+      border: 1px solid var(--admin-border);
+      border-radius: 13px;
+      background: #fffdfa;
+    }
+
+    .location-row strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .location-row small {
+      display: block;
+      margin: 5px 0;
+      color: var(--admin-muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .location-row a {
+      display: inline-block;
+      margin-top: 7px;
+      color: var(--admin-pink);
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .location-row a:hover {
+      text-decoration: underline;
+    }
+
+    .admin-footer {
+      padding: 23px 15px;
+      border-top: 1px solid var(--admin-border);
+      color: var(--admin-muted);
+      font-size: 11px;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .admin-top-inner {
+        padding: 14px 17px;
+      }
+
+      .admin-brand {
+        font-size: 17px;
+      }
+
+      .admin-logo {
+        width: 37px;
+        height: 37px;
+      }
+
+      .admin-link {
+        padding: 10px 11px;
+        font-size: 10px;
+      }
+
+      .admin-wrap {
+        width: calc(100% - 26px);
+        margin-top: 30px;
+      }
+
+      .panel {
+        padding: 18px;
+        border-radius: 14px;
+      }
+
+      .admin-actions button {
+        flex: 1 1 auto;
+      }
+
+      #adminMap {
+        height: 320px;
+      }
+
+      .location-row {
+        align-items: flex-start;
+        padding: 13px;
+      }
+
+      .location-row button {
+        flex-shrink: 0;
+        padding: 9px 11px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="admin-top">
+    <div class="admin-top-inner">
+      <a class="admin-brand" href="/">
+        <span class="admin-logo">🍰</span>
+        <span>Tatlı <b>Molası</b><small>YÖNETİM MERKEZİ</small></span>
+      </a>
+      <a class="admin-link" href="/">← Müşteri sayfası</a>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <section class="admin-intro">
+      <span class="admin-eyebrow">TATLI MOLASI · ÖZEL ALAN</span>
+      <h1>Yönetici <em>paneli.</em></h1>
+      <p>
+        Paylaşılan konumları buradan görüntüleyebilir, haritada inceleyebilir
+        ve artık ihtiyaç duymadığın kayıtları silebilirsin.
+      </p>
+      <span class="admin-badge">🔒 Yalnızca yetkili erişim</span>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <span class="panel-icon">🔑</span>
+        <div>
+          <h2>Güvenli giriş</h2>
+          <span class="hint">Yönetici anahtarınla oturum aç.</span>
+        </div>
+      </div>
+
+      <p class="hint">
+        Sunucuda tanımladığın yönetici anahtarını gir.
+        Bu anahtarı kimseyle paylaşma.
+      </p>
+
+      <label class="field" for="token">Yönetici anahtarı</label>
+      <input
+        id="token"
+        type="password"
+        autocomplete="current-password"
+        placeholder="Yönetici anahtarını gir"
+      >
+
+      <div class="admin-actions">
+        <button id="load" class="primary" type="button">
+          Konumları getir →
+        </button>
+        <button id="clearToken" class="secondary" type="button">
+          Anahtarı temizle
+        </button>
+      </div>
+
+      <p id="adminStatus" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div class="panel-heading" style="margin:0">
+          <span class="panel-icon">🗺️</span>
+          <div>
+            <h2>Konum haritası</h2>
+            <span class="hint">Paylaşılan noktaları incele.</span>
+          </div>
+        </div>
+        <button id="refresh" class="secondary" type="button">↻ Yenile</button>
+      </div>
+
+      <div id="adminMap" aria-label="Paylaşılan konumların haritası"></div>
+
+      <p class="hint map-note">
+        Yalnızca açıkça paylaşılan konumlar gösterilir.
+        Kayıtlar 24 saat sonra otomatik silinir; istersen tek tek silebilirsin.
+      </p>
+
+      <div class="section-head">
+        <h2>Konum kayıtları</h2>
+      </div>
+
+      <div id="locations">
+        <div class="empty">
+          🔎<br>
+          Güvenli giriş yaptıktan sonra konum kayıtları burada görünecek.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="admin-footer">
+    © 2026 Tatlı Molası · Yönetici paneli
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>
