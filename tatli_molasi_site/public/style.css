@@ -1,13 +1,13 @@
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap');
-
 :root {
-  --brown: #653526;
+  --brown: #713b2b;
   --brown-dark: #3e2119;
   --rose: #c87570;
   --cream: #fff9f3;
   --pink: #f8e6e0;
   --text: #38251f;
+  --muted: #78665f;
+  --border: #eddbd1;
 }
 
 * {
@@ -21,59 +21,171 @@ html {
 
 body {
   margin: 0;
+  background: var(--cream);
   color: var(--text);
-  background:
-    radial-gradient(ellipse at top left, #fff 0, transparent 45%),
-    var(--cream);
   font-family: 'DM Sans', Arial, sans-serif;
 }
 
-header {
+a {
+  color: inherit;
+}
+
+.site-header {
   position: sticky;
   top: 0;
   z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
   padding: 17px 5%;
-  background: rgba(255, 250, 245, .96);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid #ead8ce;
+  background: rgba(255, 250, 245, .97);
+  border-bottom: 1px solid var(--border);
   box-shadow: 0 4px 20px #44271b0b;
+  backdrop-filter: blur(14px);
 }
 
-.logo {
-  font-family: 'Playfair Display', serif;
-  letter-spacing: -.7px;
-  font-size: 29px;
+.logo,
+.footer-logo {
+  color: var(--brown);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 27px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
-header a {
-  transition: color .2s;
+.site-header nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 22px;
 }
 
-header a:hover {
+.site-header nav a {
+  color: #4b3a34;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-header nav a:hover {
   color: var(--rose);
 }
 
+/* KAMPANYA BANDI */
+.campaign-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 27px clamp(22px, 7vw, 90px);
+  color: #fffaf4;
+  background: linear-gradient(110deg, #713b2b, #a95649 65%, #c87570);
+}
+
+.campaign-content {
+  position: relative;
+  z-index: 1;
+}
+
+.campaign-tag {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid #ffffff70;
+  border-radius: 30px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.campaign-content h2 {
+  margin: 10px 0 5px;
+  color: white;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(25px, 4vw, 38px);
+  line-height: 1.3;
+}
+
+.campaign-content h2 strong {
+  color: #ffe5a7;
+}
+
+.campaign-content p {
+  margin: 8px 0 16px;
+  color: #fff0e6;
+  line-height: 1.6;
+}
+
+.campaign-content small {
+  display: block;
+  margin-top: 10px;
+  color: #ffebe0;
+  font-size: 11px;
+}
+
+.campaign-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  border-radius: 30px;
+  background: #fffaf4;
+  color: #713b2b;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform .2s, box-shadow .2s;
+}
+
+.campaign-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px #30160d40;
+}
+
+.campaign-decoration {
+  font-size: clamp(38px, 6vw, 75px);
+  white-space: nowrap;
+  filter: drop-shadow(0 5px 10px #35190d30);
+}
+
+/* ANA SAYFA */
 .hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 360px;
+  min-height: 390px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
+  align-items: center;
   padding: 55px max(7%, calc((100% - 1150px) / 2));
   background:
-    linear-gradient(90deg, #35190de8 0%, #482719c9 43%, #48271908 100%),
+    linear-gradient(90deg, #35190df0 0%, #482719c9 44%, #48271908 100%),
     url('https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1800&q=90')
     center 48% / cover no-repeat;
   color: white;
 }
 
+.hero-content {
+  max-width: 570px;
+}
+
+.eyebrow {
+  color: var(--rose);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.hero .eyebrow {
+  color: #ffe5c8;
+}
+
 .hero h1 {
-  max-width: 530px;
+  margin: 13px 0;
   color: white;
-  font-family: 'Playfair Display', serif;
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: clamp(38px, 5vw, 61px);
   line-height: 1.12;
   text-shadow: 0 3px 20px #0004;
@@ -82,216 +194,332 @@ header a:hover {
 .hero p {
   max-width: 440px;
   color: #fff6ef;
-  font-size: 17px;
+  font-size: 16px;
   line-height: 1.8;
 }
 
-.button {
+.primary-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border: 1px solid #ffffff66;
+  border: 1px solid #ffffff55;
   border-radius: 30px;
-  padding: 14px 25px;
+  padding: 14px 23px;
   background: linear-gradient(135deg, #a65b47, #683526);
   color: white;
-  font-weight: 700;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
   box-shadow: 0 7px 18px #3b1c1830;
   transition: transform .2s, box-shadow .2s, filter .2s;
 }
 
-.button:hover {
+.primary-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 25px #3b1c1840;
   filter: brightness(1.08);
 }
 
-section {
+/* ORTAK BÖLÜMLER */
+.section {
+  width: 100%;
   max-width: 1200px;
-  padding: 54px 24px;
+  margin: 0 auto;
+  padding: 55px 24px;
 }
 
 .section-heading {
   margin-bottom: 32px;
+  text-align: center;
 }
 
-.section-heading h2 {
+.section-heading h2,
+.panel-heading h2 {
+  margin: 8px 0;
   color: var(--brown);
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(28px, 4vw, 38px);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(27px, 4vw, 36px);
 }
 
-.section-heading p {
-  color: #78665f;
+.section-heading p,
+.panel-heading p {
+  margin: 5px 0;
+  color: var(--muted);
+  line-height: 1.7;
 }
 
+/* PASTA KARTLARI */
 .cakes {
+  display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px;
+  gap: 22px;
 }
 
 .cake-card {
+  overflow: hidden;
   border: 1px solid #eee0d7;
-  border-radius: 20px;
+  border-radius: 19px;
+  background: white;
   box-shadow: 0 7px 25px #5432220d;
   transition: transform .25s, box-shadow .25s;
 }
 
 .cake-card:hover {
-  transform: translateY(-7px);
+  transform: translateY(-6px);
   box-shadow: 0 16px 34px #54322220;
 }
 
 .cake-card img {
-  height: 225px;
-  transition: transform .4s;
+  display: block;
+  width: 100%;
+  height: 215px;
+  object-fit: cover;
+  background: var(--pink);
+  transition: transform .35s;
 }
 
 .cake-card:hover img {
   transform: scale(1.035);
 }
 
-.cake-card {
-  overflow: hidden;
+.cake-info {
+  padding: 19px;
 }
 
-.cake-info {
-  padding: 20px;
+.cake-category {
+  color: var(--rose);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
 }
 
 .cake-info h3 {
-  font-family: 'Playfair Display', serif;
+  margin: 9px 0;
+  color: var(--brown);
+  font-family: 'Playfair Display', Georgia, serif;
   font-size: 20px;
 }
 
 .cake-info p {
-  color: #78665f;
-  font-size: 14px;
+  min-height: 46px;
+  color: var(--muted);
+  font-size: 13px;
   line-height: 1.7;
 }
 
-.cake-info button {
+.select-cake {
+  width: 100%;
+  border: 1px solid #d6b7a8;
   border-radius: 24px;
   padding: 12px;
   background: #fff9f5;
-  border-color: #d6b7a8;
+  color: var(--brown);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
   transition: background .2s, color .2s;
 }
 
-.cake-info button:hover,
-.cake-info button.selected {
-  color: white;
-  background: var(--brown);
+.select-cake:hover,
+.select-cake.selected {
   border-color: var(--brown);
+  background: var(--brown);
+  color: white;
 }
 
-#siparis {
-  max-width: 850px;
+/* FORM VE KONUM */
+.lower-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  align-items: stretch;
+  gap: 24px;
 }
 
-.order-box {
-  padding: clamp(22px, 4vw, 38px);
+.order-panel,
+.location-panel {
+  min-width: 0;
+  padding: clamp(20px, 3vw, 32px);
   border: 1px solid #efded5;
-  border-radius: 24px;
+  border-radius: 22px;
   background: linear-gradient(145deg, #fff, #fff5ef);
   box-shadow: 0 12px 40px #673a270c;
+  scroll-margin-top: 100px;
 }
 
-.order-box label {
-  color: var(--brown);
-  font-size: 14px;
+.panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 23px;
 }
 
-.order-box input,
-.order-box select,
-.order-box textarea {
-  border: 1px solid #e4d2c8;
+.panel-heading h2 {
+  font-size: 25px;
+}
+
+.panel-icon {
+  font-size: 30px;
+}
+
+.mini-offer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 13px;
+  border: 1px solid #f0c7a4;
   border-radius: 12px;
-  background: #fff;
+  background: #fff0dc;
+  color: var(--brown);
+  font-size: 13px;
+}
+
+.mini-offer strong {
+  color: #a34431;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+#cake-form label {
+  display: block;
+  margin: 16px 0 8px;
+  color: var(--brown);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+#cake-form input,
+#cake-form select,
+#cake-form textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e4d2c8;
+  border-radius: 10px;
+  background: white;
   color: var(--text);
+  font: inherit;
+  font-size: 14px;
   transition: border-color .2s, box-shadow .2s;
 }
 
-.order-box input:focus,
-.order-box select:focus,
-.order-box textarea:focus {
+#cake-form input:focus,
+#cake-form select:focus,
+#cake-form textarea:focus {
   outline: none;
   border-color: var(--rose);
   box-shadow: 0 0 0 3px #c8757020;
 }
 
-.order-box textarea {
-  min-height: 125px;
+#cake-form textarea {
+  min-height: 105px;
+  resize: vertical;
 }
 
-.order-box .button {
-  border: 0;
+.full-button {
+  width: 100%;
+  margin-top: 18px;
 }
 
-#konum {
-  max-width: 850px;
-}
-
-.location-box {
-  padding: 28px;
-  border: 1px solid #eddbd1;
-  border-radius: 24px;
-  background: white;
-  box-shadow: 0 12px 40px #673a270c;
+#order-status,
+#location-status {
+  overflow-wrap: anywhere;
+  line-height: 1.7;
 }
 
 #location-status {
-  padding: 13px;
+  margin: 16px 0;
+  padding: 12px;
   border: 1px solid #e4d2c8;
-  border-radius: 12px;
+  border-radius: 11px;
   background: #fff8f2;
-  overflow-wrap: anywhere;
+  font-size: 13px;
 }
 
 #map {
-  min-height: 320px;
+  width: 100%;
+  min-height: 300px;
+  margin-top: 15px;
+  overflow: hidden;
   border: 1px solid #e8d8ce;
-  border-radius: 16px;
+  border-radius: 14px;
+  background: #f4e6dd;
   z-index: 1;
 }
 
+.privacy-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.order-output {
+  display: block;
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  border: 1px solid #e4d2c8;
+  border-radius: 10px;
+  font: 14px/1.7 'DM Sans', sans-serif;
+}
+
+/* ALT BÖLÜM */
 footer {
-  margin-top: 30px;
+  margin-top: 20px;
+  padding: 30px 20px;
   border-top: 4px solid #c7836e;
   background: linear-gradient(110deg, #3e2119, #784331);
   color: #fff5ed;
+  text-align: center;
 }
 
-footer strong {
-  font-family: 'Playfair Display', serif;
-  font-size: 24px;
+.footer-logo {
+  color: white;
+  font-size: 25px;
 }
 
-footer small {
-  display: inline-block;
-  margin-top: 10px;
-  color: #ead2c5;
+footer p {
+  color: #f7d9c9;
 }
 
-#prepared-order {
-  font: 14px/1.7 'DM Sans', sans-serif;
-  border: 1px solid #e4d2c8;
-  border-radius: 12px;
+footer a:not(.footer-logo) {
+  color: #fff5ed;
+  font-size: 13px;
+  text-decoration: none;
 }
 
+/* MOBİL UYUMLULUK */
 @media (max-width: 900px) {
+  .site-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .site-header nav {
+    gap: 15px;
+  }
+
   .cakes {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .lower-section {
+    grid-template-columns: 1fr;
+  }
+
   .hero {
-    min-height: 330px;
+    min-height: 350px;
   }
 }
 
 @media (max-width: 560px) {
-  header {
+  .site-header {
     padding: 15px 18px;
   }
 
@@ -299,9 +527,30 @@ footer small {
     font-size: 23px;
   }
 
+  .site-header nav {
+    gap: 13px;
+  }
+
+  .site-header nav a {
+    font-size: 12px;
+  }
+
+  .campaign-banner {
+    padding: 24px 18px;
+  }
+
+  .campaign-decoration {
+    align-self: flex-start;
+    font-size: 30px;
+  }
+
+  .campaign-content h2 {
+    font-size: 25px;
+  }
+
   .hero {
-    min-height: 390px;
-    padding: 38px 23px;
+    min-height: 380px;
+    padding: 35px 22px;
     background-position: 62% center;
   }
 
@@ -310,28 +559,41 @@ footer small {
   }
 
   .hero p {
-    font-size: 15px;
+    font-size: 14px;
   }
 
-  section {
+  .section {
     padding: 38px 16px;
   }
 
   .cakes {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 19px;
   }
 
   .cake-card img {
     height: 245px;
   }
 
-  .order-box,
-  .location-box {
+  .order-panel,
+  .location-panel {
     padding: 19px;
+  }
+
+  .panel-heading h2 {
+    font-size: 22px;
   }
 
   #map {
     min-height: 270px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
   }
 }
