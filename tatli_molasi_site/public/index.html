@@ -5,128 +5,238 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#fff8f1">
-  <meta name="description" content="Tatlı Molası ile çevrendeki pastaneleri, kafeleri ve tatlı duraklarını keşfet.">
-  <title>Tatlı Molası | Tatlı Bir Mola Ver</title>
-  <link rel="stylesheet" href="/style.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-</head>
-<body>
-  <div class="promo-bar">
-    <span>🎉 Açılışa Özel</span>
-    <strong>%50 İNDİRİM FIRSATLARI</strong>
-    <span>🍰 Tatlı bir mola seni bekliyor!</span>
-  </div>
 
-  <header class="navbar">
-    <a class="brand" href="/">
-      <span class="brand-icon">🍰</span>
-      <span>Tatlı <b>Molası</b><small>HER MOLADA MUTLULUK</small></span>
-    </a>
-    <nav>
-      <a href="#kesfet">Keşfet</a>
-      <a href="#harita-bolumu">Harita</a>
-      <a href="#hakkimizda">Hakkımızda</a>
-    </nav>
-    <a class="nav-button" href="#kesfet">Tatlıları Keşfet ↗</a>
+  <title>Tatlı Molası | Tatlı Bir Mola Ver</title>
+  <meta
+    name="description"
+    content="Tatlı Molası'na hoş geldin! Tatlı bir mola için bize katıl."
+  >
+
+  <!-- Harita tasarımı -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  >
+
+  <style>
+    :root {
+      --cream: #fff8f1;
+      --pink: #e9a5ae;
+      --dark: #49332e;
+      --brown: #8c5e50;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--cream);
+      color: var(--dark);
+    }
+
+    header {
+      padding: 20px;
+      background: var(--white);
+      text-align: center;
+      border-bottom: 1px solid #f1e3dc;
+    }
+
+    header h1 {
+      margin: 0;
+      color: var(--brown);
+      font-family: Georgia, serif;
+      font-size: 32px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: #826b63;
+    }
+
+    .hero {
+      padding: 65px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, #fff0e7, #f9dfe3);
+    }
+
+    .hero h2 {
+      max-width: 650px;
+      margin: 0 auto 15px;
+      font-family: Georgia, serif;
+      font-size: clamp(32px, 6vw, 48px);
+    }
+
+    .hero p {
+      max-width: 520px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    .discount {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 9px 16px;
+      border-radius: 30px;
+      background: var(--white);
+      color: #a34c60;
+      font-weight: bold;
+    }
+
+    main {
+      width: min(900px, 92%);
+      margin: 35px auto;
+    }
+
+    .card {
+      margin-bottom: 25px;
+      padding: 25px;
+      border: 1px solid #f0dfd7;
+      border-radius: 20px;
+      background: var(--white);
+      box-shadow: 0 8px 25px #593a2b0c;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-family: Georgia, serif;
+    }
+
+    .location-button {
+      width: 100%;
+      padding: 15px 20px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--pink);
+      color: #382421;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .location-button:hover {
+      opacity: 0.85;
+    }
+
+    .location-button:disabled {
+      cursor: wait;
+      opacity: 0.6;
+    }
+
+    #location-status {
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    #map {
+      width: 100%;
+      height: 350px;
+      margin-top: 18px;
+      border-radius: 14px;
+      background: #f5eee8;
+      z-index: 1;
+    }
+
+    .privacy {
+      color: #786861;
+      font-size: 13px;
+    }
+
+    footer {
+      padding: 25px 15px;
+      background: #49332e;
+      color: white;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 500px) {
+      .hero {
+        padding: 45px 18px;
+      }
+
+      .card {
+        padding: 19px;
+      }
+
+      #map {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Tatlı Molası</h1>
+    <p>Her tatlıda küçük bir mutluluk.</p>
   </header>
 
+  <section class="hero">
+    <span class="discount">Açılışa Özel %50 İndirim</span>
+    <h2>Günün en tatlı molası burada!</h2>
+    <p>
+      Kendine tatlı bir mola ver. Lezzetli anlar ve güzel sürprizler
+      Tatlı Molası'nda seni bekliyor.
+    </p>
+  </section>
+
   <main>
-    <section class="hero">
-      <div class="hero-copy">
-        <div class="eyebrow"><span>✦</span> GÜNÜN EN TATLI KEŞFİ</div>
-        <h1>Hayat kısa,<br>tatlı <em>bir mola ver.</em></h1>
-        <p>En sevdiğin pastaneleri, sıcacık kahveleri ve mutluluk veren tatlı duraklarını hemen keşfet.</p>
-        <div class="hero-actions">
-          <a class="primary-button" href="#kesfet">Yakınımdaki Mekânlar <span>→</span></a>
-          <a class="text-button" href="#harita-bolumu">Haritada gör ↓</a>
-        </div>
-        <div class="hero-note">
-          <span class="note-icon">♡</span>
-          <span><b>Küçük bir kaçamak,</b><br>kocaman bir mutluluk.</span>
-        </div>
-      </div>
-
-      <div class="hero-visual">
-        <div class="hero-photo">
-          <img
-            src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1100&q=85"
-            alt="Çikolatalı doğum günü pastası"
-          >
-        </div>
-        <div class="floating-card floating-top">
-          <span>🍓</span>
-          <div><b>Tatlı anlar</b><small>Her gün, her yerde</small></div>
-        </div>
-        <div class="floating-card floating-bottom">
-          <span class="star">✦</span>
-          <div><b>Favori mekânını bul</b><small>Keşfetmeye hemen başla</small></div>
-        </div>
-        <div class="decor decor-one">✳</div>
-        <div class="decor decor-two">♡</div>
-      </div>
+    <section class="card">
+      <h2>Tatlı dünyamızı keşfet</h2>
+      <p>
+        Tatlı bir mola vermeye hazır mısın? En güzel anlarına
+        eşlik edecek lezzetlerle tanış.
+      </p>
     </section>
 
-    <section class="category-section" id="kesfet">
-      <div class="section-heading">
-        <div>
-          <span class="eyebrow">TATLI BİR YOLCULUK</span>
-          <h2>Bugün canın <em>ne çekiyor?</em></h2>
-        </div>
-        <p>Moduna uygun bir lezzet mutlaka var.</p>
-      </div>
+    <section class="card">
+      <h2>Konumunu haritada göster</h2>
+      <p>
+        Konumunu paylaşmak istersen aşağıdaki düğmeye bas.
+        Konumun yalnızca açık izninle alınır.
+      </p>
 
-      <div class="category-grid">
-        <a class="category-card" href="#harita-bolumu">
-          <div class="category-image">
-            <img src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=650&q=80" alt="Pasta">
-          </div>
-          <div class="category-info"><span>🎂</span><div><h3>Pastaneler</h3><p>Her dilimde mutluluk</p></div><b>↗</b></div>
-        </a>
-        <a class="category-card" href="#harita-bolumu">
-          <div class="category-image">
-            <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=650&q=80" alt="Kahve">
-          </div>
-          <div class="category-info"><span>☕</span><div><h3>Kahve Durakları</h3><p>Kahvenin en güzel hâli</p></div><b>↗</b></div>
-        </a>
-        <a class="category-card" href="#harita-bolumu">
-          <div class="category-image">
-            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=650&q=80" alt="Donut ve tatlılar">
-          </div>
-          <div class="category-info"><span>🍩</span><div><h3>Tatlı Kaçamakları</h3><p>Kendini şımart</p></div><b>↗</b></div>
-        </a>
-      </div>
-    </section>
+      <button
+        id="location-button"
+        class="location-button"
+        type="button"
+      >
+        Konumumu Kullan
+      </button>
 
-    <section class="map-section" id="harita-bolumu">
-      <div class="map-intro">
-        <span class="eyebrow">ÇEVRENDEKİ LEZZETLER</span>
-        <h2>Tatlı duraklar <em>seni bekliyor.</em></h2>
-        <p>Konum iznini paylaşarak çevrendeki kayıtlı mekânları haritada görüntüleyebilirsin.</p>
-        <button class="primary-button" id="location-button" type="button">Konumumu Kullan ↗</button>
-        <p class="privacy-note">🔒 Konumun yalnızca izin verdiğinde kullanılır.</p>
-        <div id="location-status" class="location-status" role="status"></div>
-      </div>
-      <div class="map-frame">
-        <div id="map" aria-label="Mekânları gösteren harita"></div>
-      </div>
-    </section>
+      <p id="location-status" role="status" aria-live="polite">
+        🔒 Konumun yalnızca izin verdiğinde kullanılır.
+      </p>
 
-    <section class="closing-section" id="hakkimizda">
-      <span class="closing-icon">♡</span>
-      <span class="eyebrow">KÜÇÜK BİR MUTLULUK MOLASI</span>
-      <h2>Güzel şeyler <em>paylaştıkça tatlanır.</em></h2>
-      <p>Yeni yerler keşfet, favori lezzetlerini bul ve kendine tatlı bir mola ver.</p>
-      <a class="primary-button" href="#kesfet">Keşfe Başla →</a>
+      <p class="privacy">
+        Konumunu paylaşmak isteğe bağlıdır. İzin vermediğinde
+        konumun alınmaz.
+      </p>
+
+      <div
+        id="map"
+        role="application"
+        aria-label="Konum haritası"
+      ></div>
     </section>
   </main>
 
   <footer>
-    <a class="brand footer-brand" href="/"><span class="brand-icon">🍰</span><span>Tatlı <b>Molası</b></span></a>
-    <p>Bir kahve, bir tatlı, biraz mutluluk. ♡</p>
-    <span>© 2026 Tatlı Molası</span>
+    <strong>Tatlı Molası</strong>
+    <br>
+    Tatlı anlar, güzel molalar.
   </footer>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="/app.js"></script>
+  <!-- Önce harita kütüphanesi, sonra site JavaScript'i yüklenir. -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    defer
+  ></script>
+  <script src="/app.js" defer></script>
 </body>
 </html>
