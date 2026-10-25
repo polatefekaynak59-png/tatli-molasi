@@ -1,100 +1,114 @@
 
-const statusEl = document.getElementById("location-status");
-const shareBtn = document.getElementById("location-button");
-const mapElement = document.getElementById("map");
+const express = require("express");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
-function setStatus(message, error = false) {
-  if (!statusEl) return;
-  statusEl.textContent = message;
-  statusEl.style.color = error ? "#9c3027" : "";
-}
+const app = express();
+const PORT = process.env.PORT || 3000;
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || "";
 
-if (!mapElement || !window.L) {
-  setStatus("Harita yüklenemedi. Sayfayı yenileyip tekrar dene.", true);
-} else {
-  const map = L.map(mapElement).setView([37.0662, 37.3833], 11);
+const dataDir = path.join(__dirname, "data");
+const dataFile = path.join(dataDir, "locations.json");
 
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "&copy; OpenStreetMap"
-  }).addTo(map);
+app.use(express.json({ limit: "10kb" }));
+app.use(express.static(path.join(__dirname, "public")));
 
-  const markers = L.layerGroup().addTo(map);
-
-  if (!shareBtn) {
-    setStatus("Konum butonu bulunamadı.", true);
-  } else {
-    shareBtn.addEventListener("click", () => {
-      if (!navigator.geolocation) {
-        setStatus("Tarayıcın konum özelliğini desteklemiyor.", true);
-        return;
-      }
-
-      if (!window.isSecureContext) {
-        setStatus("Konum için HTTPS bağlantısı gerekli.", true);
-        return;
-      }
-
-      if (!confirm(
-        "Konumunu yönetici panelinde paylaşmak istiyor musun? Kayıt 24 saat içinde silinir."
-      )) {
-        setStatus("Konum paylaşılmadı.");
-        return;
-      }
-
-      shareBtn.disabled = true;
-      setStatus("Konum izni bekleniyor…");
-
-      navigator.geolocation.getCurrentPosition(async position => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-
-        try {
-          const response = await fetch("/api/share-location", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              latitude,
-              longitude,
-              consent: true,
-              label: "Müşteri konumu"
-            })
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || "Konum gönderilemedi.");
-          }
-
-          markers.clearLayers();
-
-          L.marker([latitude, longitude])
-            .addTo(markers)
-            .bindPopup("Konumun")
-            .openPopup();
-
-          map.setView([latitude, longitude], 15);
-          setStatus("Konumun yönetici paneline iletildi.");
-        } catch (error) {
-          setStatus("Hata: " + error.message, true);
-        } finally {
-          shareBtn.disabled = false;
-        }
-      }, error => {
-        const messages = {
-          1: "Konum izni reddedildi. Tarayıcı ayarlarından konum iznini aç.",
-          2: "Konum bulunamadı. Cihazının konum ayarlarını kontrol et.",
-          3: "Konum isteği zaman aşımına uğradı. Tekrar dene."
-        };
-
-        setStatus(messages[error.code] || "Konum alınamadı.", true);
-        shareBtn.disabled = false;
-      }, {
-        enableHighAccuracy: true,
-        timeout: 20000,
-        maximumAge: 0
-      });
-    });
+function readLocations() {
+  try {
+    if (!fs.existsSync(dataFile)) return [];
+    const data = JSON.parse(fs.readFileSync(dataFile, "utf8"));
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
   }
 }
+
+function saveLocations(locations) {
+  fs.mkdirSync(dataDir, { recursive: true });
+  fs.writeFileSync(dataFile, JSON.stringify(locations, null, 2));
+}
+
+function cleanExpired() {
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const locations = readLocations().filter(
+    item => new Date(item.createdAt).getTime() > cutoff
+  );
+  saveLocations(locations);
+  return locations;
+}
+
+function isAdmin(req) {
+  const token = req.get("x-admin-token") || "";
+  if (!ADMIN_TOKEN || !token) return false;
+
+  const a = Buffer.from(token);
+  const b = Buffer.from(ADMIN_TOKEN);
+
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
+app.post("/api/share-location", (req, res) => {
+  const body = req.body || {};
+  const latitude = Number(body.latitude ?? body.lat);
+  const longitude = Number(body.longitude ?? body.lng);
+
+  if (body.consent !== true) {
+    return res.status(400).json({
+      error: "Konum paylaşımı için açık onay gerekiyor."
+    });
+  }
+
+  if (
+    !Number.isFinite(latitude) ||
+    !Number.isFinite(longitude) ||
+    latitude < -90 || latitude > 90 ||
+    longitude < -180 || longitude > 180
+  ) {
+    return res.status(400).json({ error: "Konum bilgisi geçersiz." });
+  }
+
+  const locations = cleanExpired();
+
+  locations.push({
+    id: crypto.randomUUID(),
+    latitude,
+    longitude,
+    createdAt: new Date().toISOString()
+  });
+
+  saveLocations(locations);
+  res.status(201).json({ ok: true });
+});
+
+app.get("/api/admin/locations", (req, res) => {
+  if (!isAdmin(req)) {
+    return res.status(401).json({ error: "Yönetici anahtarı geçersiz." });
+  }
+
+  res.json(cleanExpired());
+});
+
+app.delete("/api/admin/locations/:id", (req, res) => {
+  if (!isAdmin(req)) {
+    return res.status(401).json({ error: "Yönetici anahtarı geçersiz." });
+  }
+
+  const locations = cleanExpired();
+  const remaining = locations.filter(item => item.id !== req.params.id);
+
+  if (remaining.length === locations.length) {
+    return res.status(404).json({ error: "Kayıt bulunamadı." });
+  }
+
+  saveLocations(remaining);
+  res.json({ ok: true });
+});
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Tatlı Molası sunucusu ${PORT} portunda çalışıyor.`);
+});
