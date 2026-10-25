@@ -4,39 +4,464 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#6f3d2e">
-  <meta name="description" content="Tatlı Molası konum paylaşım sitesi">
-  <title>Tatlı Molası</title>
+  <meta name="theme-color" content="#713f32">
+  <meta name="description" content="Tatlı Molası - Hayalindeki pastayı seç!">
+  <title>Tatlı Molası | Tatlı mutluluklar</title>
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  >
-
+  <link rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="/style.css">
+
+  <style>
+    :root {
+      --brown: #713f32;
+      --pink: #f8e6e2;
+      --cream: #fffaf5;
+      --text: #39251f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 22px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      background: white;
+      border-bottom: 1px solid #f0dfd8;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 800;
+      color: var(--brown);
+    }
+
+    header a {
+      color: var(--brown);
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .hero {
+      padding: 65px 20px;
+      text-align: center;
+      background: linear-gradient(135deg, #f7e2dc, #fff6e9);
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 6vw, 55px);
+      margin: 0 0 15px;
+      color: var(--brown);
+    }
+
+    .hero p {
+      max-width: 600px;
+      margin: 0 auto 24px;
+      line-height: 1.7;
+      color: #694e45;
+    }
+
+    .button {
+      display: inline-block;
+      border: 0;
+      border-radius: 25px;
+      padding: 14px 24px;
+      background: var(--brown);
+      color: white;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    section {
+      max-width: 1150px;
+      margin: auto;
+      padding: 45px 20px;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .section-heading h2 {
+      color: var(--brown);
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .cakes {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 22px;
+    }
+
+    .cake-card {
+      background: white;
+      border: 1px solid #f0e2db;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 5px 18px #5835220d;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .cake-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px #5835221a;
+    }
+
+    .cake-card img {
+      width: 100%;
+      height: 205px;
+      object-fit: cover;
+      display: block;
+      background: var(--pink);
+    }
+
+    .cake-info { padding: 17px; }
+
+    .cake-info h3 {
+      color: var(--brown);
+      margin: 0 0 8px;
+    }
+
+    .cake-info p {
+      line-height: 1.5;
+      color: #725d55;
+      font-size: 14px;
+      min-height: 42px;
+    }
+
+    .cake-info button {
+      width: 100%;
+      border: 1px solid var(--brown);
+      background: white;
+      color: var(--brown);
+      padding: 11px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .cake-info button:hover,
+    .cake-info button.selected {
+      background: var(--brown);
+      color: white;
+    }
+
+    .order-box {
+      max-width: 720px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 20px;
+      background: white;
+      border: 1px solid #f0e2db;
+    }
+
+    .order-box label {
+      display: block;
+      font-weight: bold;
+      margin: 17px 0 8px;
+    }
+
+    .order-box input,
+    .order-box select,
+    .order-box textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddc9bf;
+      border-radius: 10px;
+      font: inherit;
+      background: white;
+    }
+
+    .order-box textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .order-box .button {
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    #order-status {
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .location-box {
+      max-width: 720px;
+      margin: auto;
+      padding: 24px;
+      border-radius: 18px;
+      background: #f8e9e3;
+      text-align: center;
+    }
+
+    #map {
+      height: 300px;
+      width: 100%;
+      margin-top: 18px;
+      border-radius: 12px;
+    }
+
+    footer {
+      background: #4d2c24;
+      color: white;
+      padding: 28px 20px;
+      text-align: center;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 500px) {
+      header { padding: 18px; }
+      .logo { font-size: 21px; }
+      .hero { padding: 48px 18px; }
+      section { padding: 35px 16px; }
+      .order-box { padding: 18px; }
+    }
+  </style>
 </head>
 
 <body>
-  <main class="container">
-    <h1>🍰 Tatlı Molası</h1>
+  <header>
+    <div class="logo">🍰 Tatlı Molası</div>
+    <a href="#pastalar">Pastaları Keşfet</a>
+  </header>
 
-    <p>
-      Konumunu haritada göstermek için aşağıdaki butona bas.
-      Konumun yalnızca izin verdiğinde paylaşılır.
-    </p>
+  <main>
+    <div class="hero">
+      <h1>Her dilimde mutluluk!</h1>
+      <p>
+        Özel günlerine tat kat. Pastanı seç, hayalindeki tasarımı anlat
+        ve Tatlı Molası'na nasıl bir pasta istediğini bildir.
+      </p>
+      <a class="button" href="#pastalar">Pastaları İncele</a>
+    </div>
 
-    <button id="location-button" type="button">
-      Konumumu Kullan
-    </button>
+    <section id="pastalar">
+      <div class="section-heading">
+        <h2>Pastalarımız</h2>
+        <p>Beğendiğin pastayı seç veya kendi tasarımını anlat.</p>
+      </div>
 
-    <p id="location-status" role="status" aria-live="polite">
-      Konum paylaşmak için butona bas.
-    </p>
+      <div class="cakes">
+        <article class="cake-card">
+          <img
+            src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=800&q=80"
+            alt="Çikolatalı doğum günü pastası"
+            loading="lazy">
+          <div class="cake-info">
+            <h3>Çikolatalı Pasta</h3>
+            <p>Yoğun çikolata görünümüyle özel günlere uygun.</p>
+            <button type="button" data-cake="Çikolatalı Pasta">Bu Pastayı Seç</button>
+          </div>
+        </article>
 
-    <div id="map" style="height: 400px; width: 100%;"></div>
+        <article class="cake-card">
+          <img
+            src="https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=800&q=80"
+            alt="Renkli ve süslü pasta"
+            loading="lazy">
+          <div class="cake-info">
+            <h3>Özel Tasarım Pasta</h3>
+            <p>Renklerini ve süslemelerini kendi zevkine göre düşün.</p>
+            <button type="button" data-cake="Özel Tasarım Pasta">Bu Pastayı Seç</button>
+          </div>
+        </article>
+
+        <article class="cake-card">
+          <img
+            src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=80"
+            alt="Kutlama için pasta"
+            loading="lazy">
+          <div class="cake-info">
+            <h3>Kutlama Pastası</h3>
+            <p>Doğum günü ve diğer güzel anların için.</p>
+            <button type="button" data-cake="Kutlama Pastası">Bu Pastayı Seç</button>
+          </div>
+        </article>
+
+        <article class="cake-card">
+          <img
+            src="https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80"
+            alt="Çilekli tatlı sunumu"
+            loading="lazy">
+          <div class="cake-info">
+            <h3>Meyveli Pasta</h3>
+            <p>Meyve detaylarıyla ferah ve renkli bir seçenek.</p>
+            <button type="button" data-cake="Meyveli Pasta">Bu Pastayı Seç</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="siparis">
+      <div class="section-heading">
+        <h2>Hayalindeki Pastayı Anlat</h2>
+        <p>Beğendiğin modeli seç ve istediğin ayrıntıları yaz.</p>
+      </div>
+
+      <form class="order-box" id="cake-form">
+        <label for="cake-choice">Hangi pastayı istiyorsun?</label>
+        <select id="cake-choice" name="cake" required>
+          <option value="">Pasta seç</option>
+          <option>Çikolatalı Pasta</option>
+          <option>Özel Tasarım Pasta</option>
+          <option>Kutlama Pastası</option>
+          <option>Meyveli Pasta</option>
+          <option>Kendi Tasarımım</option>
+        </select>
+
+        <label for="cake-size">Kaç kişilik olsun?</label>
+        <select id="cake-size" name="size" required>
+          <option value="">Kişi sayısını seç</option>
+          <option>2-4 kişilik</option>
+          <option>6-8 kişilik</option>
+          <option>10-12 kişilik</option>
+          <option>15-20 kişilik</option>
+          <option>20 kişiden fazla</option>
+        </select>
+
+        <label for="cake-flavor">Pasta çeşidi / aroması</label>
+        <select id="cake-flavor" name="flavor">
+          <option>Çikolatalı</option>
+          <option>Çilekli</option>
+          <option>Meyveli</option>
+          <option>Vanilyalı</option>
+          <option>Karışık</option>
+          <option>Henüz karar vermedim</option>
+        </select>
+
+        <label for="cake-date">Hangi gün için istiyorsun?</label>
+        <input id="cake-date" name="date" type="date">
+
+        <label for="cake-details">Pasta nasıl görünsün?</label>
+        <textarea id="cake-details" name="details"
+          placeholder="Örneğin: Pembe renkli, üzerinde çilekler ve iyi ki doğdun yazısı olsun..."></textarea>
+
+        <label for="customer-name">Adın (isteğe bağlı)</label>
+        <input id="customer-name" name="name" type="text"
+          maxlength="80" placeholder="Adını yaz">
+
+        <button class="button" type="submit">Pasta Talebimi Hazırla</button>
+
+        <p id="order-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section id="konum">
+      <div class="section-heading">
+        <h2>Konum Paylaşımı</h2>
+        <p>Konumunu paylaşmak istersen aşağıdaki butonu kullanabilirsin.</p>
+      </div>
+
+      <div class="location-box">
+        <button class="button" id="location-button" type="button">
+          Konumumu Kullan
+        </button>
+        <p id="location-status" role="status" aria-live="polite">
+          Konum paylaşmak için butona bas.
+        </p>
+        <div id="map"></div>
+      </div>
+    </section>
   </main>
+
+  <footer>
+    <strong>🍰 Tatlı Molası</strong>
+    <div>Her dilimde mutluluk!</div>
+    <small>Fotoğraflar ve ürün görselleri internet bağlantısıyla yüklenir.</small>
+  </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/app.js" defer></script>
+
+  <script>
+    // Pasta seçme butonları
+    document.querySelectorAll("[data-cake]").forEach(function(button) {
+      button.addEventListener("click", function() {
+        document.getElementById("cake-choice").value = button.dataset.cake;
+        document.getElementById("siparis").scrollIntoView({ behavior: "smooth" });
+
+        document.querySelectorAll("[data-cake]").forEach(function(item) {
+          item.classList.remove("selected");
+          item.textContent = "Bu Pastayı Seç";
+        });
+
+        button.classList.add("selected");
+        button.textContent = "Seçildi ✓";
+      });
+    });
+
+    // Talebi kullanıcının kendi cihazında hazırlar.
+    // Bu form, bir işletmeye otomatik sipariş göndermez.
+    document.getElementById("cake-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const form = event.currentTarget;
+      const data = new FormData(form);
+
+      const details = [
+        "TATLI MOLASI - PASTA TALEBİ",
+        "Pasta: " + (data.get("cake") || ""),
+        "Boyut: " + (data.get("size") || ""),
+        "Aroma: " + (data.get("flavor") || ""),
+        "Tarih: " + (data.get("date") || "Belirtilmedi"),
+        "Açıklama: " + (data.get("details") || "Belirtilmedi"),
+        "Ad: " + (data.get("name") || "Belirtilmedi")
+      ].join("\n");
+
+      document.getElementById("order-status").textContent =
+        "Talebin hazırlandı. Aşağıdaki metni kopyalayıp işletmeye iletebilirsin.";
+
+      const old = document.getElementById("prepared-order");
+      if (old) old.remove();
+
+      const output = document.createElement("textarea");
+      output.id = "prepared-order";
+      output.readOnly = true;
+      output.rows = 8;
+      output.style.cssText =
+        "width:100%;margin-top:12px;padding:12px;border-radius:10px;";
+      output.value = details;
+
+      const copy = document.createElement("button");
+      copy.type = "button";
+      copy.className = "button";
+      copy.style.width = "100%";
+      copy.style.marginTop = "10px";
+      copy.textContent = "Talebi Kopyala";
+      copy.addEventListener("click", async function() {
+        try {
+          await navigator.clipboard.writeText(details);
+          copy.textContent = "Kopyalandı ✓";
+        } catch {
+          output.focus();
+          output.select();
+          document.execCommand("copy");
+          copy.textContent = "Kopyalama denendi";
+        }
+      });
+
+      document.getElementById("order-status").after(output, copy);
+    });
+
+    // Tarih seçicide geçmiş günleri engelle
+    document.getElementById("cake-date").min =
+      new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString().slice(0, 10);
+  </script>
 </body>
 </html>
